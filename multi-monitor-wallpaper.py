@@ -202,10 +202,63 @@ class MultiMonitorWallpaper:
         # If all APIs fail, use local quotes
         return random.choice(quotes)
     
+    def validate_image_dimensions(self, image_path):
+        """Validate image has reasonable dimensions to prevent stretching"""
+        try:
+            result = subprocess.run(
+                ['identify', '-format', '%wx%h', image_path],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            )
+            if result.returncode == 0:
+                dimensions = result.stdout.strip()
+                width, height = map(int, dimensions.split('x'))
+                
+                # Skip very small images (likely thumbnails) or very thin images
+                if width < 800 or height < 600:
+                    print(f"Skipping small image {os.path.basename(image_path)}: {dimensions}")
+                    return False
+                
+                # Skip images with extreme aspect ratios that would stretch badly
+                aspect_ratio = width / height
+                if aspect_ratio < 0.7 or aspect_ratio > 3.0:
+                    print(f"Skipping image with extreme aspect ratio {os.path.basename(image_path)}: {dimensions} (ratio: {aspect_ratio:.2f})")
+                    return False
+                    
+                return True
+            return False
+        except Exception as e:
+            print(f"Could not validate {os.path.basename(image_path)}: {e}")
+            return False
+
     def create_combined_wallpaper(self, wallpapers):
         """Create a single image spanning both monitors with quote"""
         if len(wallpapers) < 2 or len(self.monitors) < 2:
             return None
+        
+        # Pre-validate individual images to prevent stretching issues
+        valid_wallpapers = []
+        for wp in wallpapers:
+            if self.validate_image_dimensions(wp):
+                valid_wallpapers.append(wp)
+            else:
+                print(f"Replacing invalid wallpaper: {os.path.basename(wp)}")
+        
+        # If we don't have enough valid wallpapers, get replacements
+        if len(valid_wallpapers) < 2:
+            print("Need replacement wallpapers due to validation failures")
+            all_wallpapers = self.get_random_wallpapers(10)  # Get more options
+            for wp in all_wallpapers:
+                if wp not in wallpapers and self.validate_image_dimensions(wp):
+                    valid_wallpapers.append(wp)
+                    if len(valid_wallpapers) >= 2:
+                        break
+        
+        # If still not enough valid wallpapers, skip this cycle
+        if len(valid_wallpapers) < 2:
+            print("ERROR: Could not find enough valid wallpapers, skipping cycle")
+            return None
+            
+        wallpapers = valid_wallpapers[:2]  # Use the validated wallpapers
             
         output_path = Path.home() / '.cache' / 'multi-monitor-wallpaper.jpg'
         temp_path = Path.home() / '.cache' / 'temp-wallpaper.jpg'
@@ -462,9 +515,18 @@ class MultiMonitorWallpaper:
                     dimensions = result.stdout.strip()
                     print(f"Combined wallpaper dimensions: {dimensions}")
                     
-                    if dimensions != "3840x1080":
-                        print(f"ERROR: Wrong dimensions! Expected 3840x1080, got {dimensions}")
+                    # Check if dimensions match expected multi-monitor setup
+                    expected_width = sum(int(m['resolution'].split('x')[0]) for m in self.monitors[:2])
+                    expected_height = int(self.monitors[0]['resolution'].split('x')[1])
+                    expected_dimensions = f"{expected_width}x{expected_height}"
+                    
+                    if dimensions != expected_dimensions:
+                        print(f"ERROR: Wrong dimensions! Expected {expected_dimensions}, got {dimensions}")
                         print("Skipping this wallpaper cycle to prevent stretching")
+                        
+                        # Clean up the bad combined image
+                        if os.path.exists(combined):
+                            os.unlink(combined)
                         return  # Skip this cycle
                     
                     # Force GNOME to spanned mode before setting wallpaper
