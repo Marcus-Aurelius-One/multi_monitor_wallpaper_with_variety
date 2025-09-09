@@ -1,48 +1,84 @@
 # Multi-Monitor Wallpaper Manager with Variety Integration
 
-A Python script that displays different wallpapers on each monitor with inspirational quotes, using wallpapers downloaded by Variety.
+A sophisticated Python script that displays different wallpapers on each monitor with inspirational quotes, leveraging Variety's excellent wallpaper sources while maintaining complete display control.
 
-## Features
+## ✨ Features
 
-- **Different wallpapers on each monitor** - Each monitor gets its own unique wallpaper
-- **Inspirational quotes** - Displays quotes in the bottom-right corner of the right monitor
-- **Automatic cycling** - Changes wallpapers every 60 seconds
-- **Variety integration** - Uses wallpapers downloaded by Variety
-- **GNOME compatible** - Works with GNOME desktop environment
-- **Auto-start on boot** - Runs as a systemd service
+- **🖼️ Different wallpapers per monitor** - Each monitor displays unique, high-quality images
+- **💬 Dynamic inspirational quotes** - Beautiful quote overlays with rounded corners and smart text wrapping
+- **🔄 Intelligent rotation** - Avoids recent repeats and automatically requests fresh downloads
+- **🌐 Variety integration** - Leverages Variety's diverse sources (NASA APOD, Bing, National Geographic, Unsplash, etc.)
+- **🎨 Perfect formatting** - Dynamic quote box sizing with proper transparency and positioning
+- **⚡ Auto-cycling** - Configurable interval (default 60 seconds)
+- **🚀 Auto-start on boot** - Runs reliably as a systemd user service
+- **🛡️ Conflict-free** - Completely isolates Variety's display control to prevent interference
 
-## Requirements
+## 📋 Requirements
 
-- Python 3
-- ImageMagick (`convert` command)
-- xwallpaper (optional, for non-GNOME environments)
-- Variety (for downloading wallpapers)
-- GNOME desktop environment (or compatible)
+- **Python 3** - Core runtime
+- **ImageMagick** - Image processing (`convert` command)  
+- **Variety** - Wallpaper source provider
+- **GNOME** - Desktop environment (Ubuntu, Fedora, etc.)
+- **Dual monitors** - Currently optimized for two 1920x1080 displays
 
-## Installation
+## 🚀 Installation
 
-### Quick Install
+### Quick Install (Recommended)
 
-Run the install script:
 ```bash
+git clone https://github.com/Marcus-Aurelius-One/multi_monitor_wallpaper_with_variety.git
+cd multi_monitor_wallpaper_with_variety
 chmod +x install.sh
 ./install.sh
 ```
 
+The installer will:
+- ✅ Install required dependencies (ImageMagick)
+- ✅ Set up the wallpaper management service  
+- ✅ Configure Variety to work as a download-only service
+- ✅ Enable auto-start on boot
+- ✅ Start the service immediately
+
+## 🎨 What You Get
+
+**Visual Experience:**
+- **Left Monitor**: Beautiful wallpaper (NASA space images, nature photography, etc.)
+- **Right Monitor**: Different wallpaper + inspirational quote in bottom-right corner
+- **Quotes**: Elegant rounded boxes with perfect text wrapping and transparency
+- **Rotation**: Fresh content every 60 seconds with intelligent variety
+
+**Content Sources** (via Variety):
+- 🚀 **NASA APOD** - Stunning space and astronomy imagery
+- 🌍 **Google Earth View** - Breathtaking satellite imagery  
+- 📰 **Bing Photo of the Day** - Microsoft's curated daily photos
+- 📸 **National Geographic** - Professional nature and travel photography
+- 🎨 **Unsplash** - High-resolution artistic photography
+- 📷 **Flickr** - Community-sourced quality images
+
+**Quote Sources:**
+- 🌐 **Online APIs** - ZenQuotes, Quotable (thousands of quotes)
+- 📚 **Local fallback** - 25+ built-in inspirational quotes
+- 🎯 **Smart selection** - Avoids repetition, handles long quotes gracefully
+
 ### Manual Installation
 
-1. Install dependencies:
+<details>
+<summary>Click to expand manual installation steps</summary>
+
+1. **Install dependencies:**
 ```bash
-sudo apt install imagemagick xwallpaper
+sudo apt install imagemagick variety
 ```
 
-2. Copy the Python script to your home directory:
+2. **Clone and setup:**
 ```bash
+git clone https://github.com/Marcus-Aurelius-One/multi_monitor_wallpaper_with_variety.git
+cd multi_monitor_wallpaper_with_variety
 cp multi-monitor-wallpaper.py ~/
 chmod +x ~/multi-monitor-wallpaper.py
 ```
 
-3. Install the systemd service:
+3. **Install systemd service:**
 ```bash
 mkdir -p ~/.config/systemd/user
 cp multi-monitor-wallpaper.service ~/.config/systemd/user/
@@ -50,6 +86,15 @@ systemctl --user daemon-reload
 systemctl --user enable multi-monitor-wallpaper.service
 systemctl --user start multi-monitor-wallpaper.service
 ```
+
+4. **Configure Variety (important):**
+Edit `~/.config/variety/variety.conf` and set:
+```
+change_enabled = False
+change_on_start = False
+```
+
+</details>
 
 ## Configuration
 
