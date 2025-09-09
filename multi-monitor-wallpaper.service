@@ -4,11 +4,11 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /home/marcus_aurelius/multi-monitor-wallpaper.py
+ExecStart=/usr/bin/python3 $HOME/multi-monitor-wallpaper.py
 Restart=always
 RestartSec=10
 Environment="DISPLAY=:0"
-Environment="XAUTHORITY=/home/marcus_aurelius/.Xauthority"
+Environment="XAUTHORITY=$HOME/.Xauthority"
 
 [Install]
 WantedBy=default.target
