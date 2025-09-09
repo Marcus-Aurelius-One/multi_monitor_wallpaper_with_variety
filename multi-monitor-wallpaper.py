@@ -102,16 +102,21 @@ class MultiMonitorWallpaper:
         # Smart selection: avoid recently used when possible
         unused_wallpapers = [w for w in wallpapers if w not in self.used_wallpapers]
         
-        if len(unused_wallpapers) >= count:
-            selected = random.sample(unused_wallpapers, count)
-        else:
-            # Reset used list if we've used most wallpapers
-            if len(self.used_wallpapers) > len(wallpapers) * 0.8:
-                print("Resetting used wallpaper list for more variety...")
-                self.used_wallpapers.clear()
-            
-            # Select from all available wallpapers
-            selected = random.sample(wallpapers, count)
+        try:
+            if len(unused_wallpapers) >= count:
+                selected = random.sample(unused_wallpapers, count)
+            else:
+                # Reset used list if we've used most wallpapers
+                if len(self.used_wallpapers) > len(wallpapers) * 0.8:
+                    print("Resetting used wallpaper list for more variety...")
+                    self.used_wallpapers.clear()
+                
+                # Select from all available wallpapers
+                selected = random.sample(wallpapers, count)
+        except Exception as e:
+            print(f"ERROR in wallpaper selection: {e}")
+            # Fallback: just pick the first few wallpapers
+            selected = wallpapers[:count] if len(wallpapers) >= count else wallpapers
         
         # Ensure no duplicates in current selection
         while len(set(selected)) < len(selected):
@@ -512,4 +517,4 @@ if __name__ == "__main__":
         print("Will use xwallpaper method only.")
     
     cycler = MultiMonitorWallpaper()
-    cycler.run(interval=2)  # Change wallpaper every 2 seconds for testing
+    cycler.run(interval=60)  # Change wallpaper every 60 seconds

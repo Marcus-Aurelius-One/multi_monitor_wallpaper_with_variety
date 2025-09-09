@@ -4,11 +4,12 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 $HOME/multi-monitor-wallpaper.py
+ExecStart=/usr/bin/python3 %h/multi-monitor-wallpaper.py
 Restart=always
 RestartSec=10
-Environment="DISPLAY=:0"
-Environment="XAUTHORITY=$HOME/.Xauthority"
+Environment=DISPLAY=:0
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+Environment=XDG_RUNTIME_DIR=%h/.config
 
 [Install]
 WantedBy=default.target
