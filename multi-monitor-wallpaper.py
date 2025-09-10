@@ -72,7 +72,7 @@ class MultiMonitorWallpaper:
             print("Could not trigger Variety downloads")
             return False
     
-    def get_random_wallpapers(self, count=2):
+    def get_random_wallpapers(self, count=3):
         """Get random wallpaper paths from Variety's downloads"""
         wallpapers = []
         for root, dirs, files in os.walk(self.wallpaper_dir):
@@ -231,8 +231,8 @@ class MultiMonitorWallpaper:
             return False
 
     def create_combined_wallpaper(self, wallpapers):
-        """Create a single image spanning both monitors with quote"""
-        if len(wallpapers) < 2 or len(self.monitors) < 2:
+        """Create a single image spanning all three monitors with quote"""
+        if len(wallpapers) < 3 or len(self.monitors) < 3:
             return None
         
         # Pre-validate individual images to prevent stretching issues
@@ -244,21 +244,21 @@ class MultiMonitorWallpaper:
                 print(f"Replacing invalid wallpaper: {os.path.basename(wp)}")
         
         # If we don't have enough valid wallpapers, get replacements
-        if len(valid_wallpapers) < 2:
+        if len(valid_wallpapers) < 3:
             print("Need replacement wallpapers due to validation failures")
-            all_wallpapers = self.get_random_wallpapers(10)  # Get more options
+            all_wallpapers = self.get_random_wallpapers(15)  # Get more options
             for wp in all_wallpapers:
                 if wp not in wallpapers and self.validate_image_dimensions(wp):
                     valid_wallpapers.append(wp)
-                    if len(valid_wallpapers) >= 2:
+                    if len(valid_wallpapers) >= 3:
                         break
         
         # If still not enough valid wallpapers, skip this cycle
-        if len(valid_wallpapers) < 2:
+        if len(valid_wallpapers) < 3:
             print("ERROR: Could not find enough valid wallpapers, skipping cycle")
             return None
             
-        wallpapers = valid_wallpapers[:2]  # Use the validated wallpapers
+        wallpapers = valid_wallpapers[:3]  # Use the validated wallpapers
             
         output_path = Path.home() / '.cache' / 'multi-monitor-wallpaper.jpg'
         temp_path = Path.home() / '.cache' / 'temp-wallpaper.jpg'
@@ -266,8 +266,9 @@ class MultiMonitorWallpaper:
         # Get dimensions for each monitor
         monitor1_width = int(self.monitors[0]['resolution'].split('x')[0])
         monitor2_width = int(self.monitors[1]['resolution'].split('x')[0])
+        monitor3_width = int(self.monitors[2]['resolution'].split('x')[0])
         height = int(self.monitors[0]['resolution'].split('x')[1])
-        total_width = monitor1_width + monitor2_width
+        total_width = monitor1_width + monitor2_width + monitor3_width
         
         # Build ImageMagick command to combine images
         # Each image is resized to exactly fit its corresponding monitor
@@ -278,12 +279,17 @@ class MultiMonitorWallpaper:
             wallpapers[0],
             '-resize', f'{monitor1_width}x{height}!',  # ! forces exact size
             ')',
-            # Second image for right monitor  
+            # Second image for middle monitor  
             '(',
             wallpapers[1],
             '-resize', f'{monitor2_width}x{height}!',  # ! forces exact size
             ')',
-            # Combine side by side
+            # Third image for right monitor
+            '(',
+            wallpapers[2],
+            '-resize', f'{monitor3_width}x{height}!',  # ! forces exact size
+            ')',
+            # Combine all three side by side
             '+append',
             str(temp_path)
         ]
@@ -396,8 +402,8 @@ class MultiMonitorWallpaper:
             subprocess.run(overlay_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             
             # Now composite the overlay onto the wallpaper
-            # Position it on the right monitor, bottom-right corner
-            overlay_x = monitor1_width + monitor2_width - box_width - 50
+            # Position it on the rightmost monitor (third monitor), bottom-right corner
+            overlay_x = monitor1_width + monitor2_width + monitor3_width - box_width - 50
             overlay_y = height - box_height - 50  # Position from top
             
             quote_cmd_with_shadow = [
@@ -488,20 +494,20 @@ class MultiMonitorWallpaper:
         """Change wallpapers to new random ones"""
         wallpapers = self.get_random_wallpapers(len(self.monitors))
         
-        if not wallpapers or len(wallpapers) < 2:
-            print(f"ERROR: Insufficient wallpapers found! Got {len(wallpapers)}, need 2")
+        if not wallpapers or len(wallpapers) < 3:
+            print(f"ERROR: Insufficient wallpapers found! Got {len(wallpapers)}, need 3")
             return
         
         # Verify the wallpapers are different
-        if wallpapers[0] == wallpapers[1]:
-            print("WARNING: Selected same wallpaper twice, retrying...")
+        if len(set(wallpapers)) < len(wallpapers):
+            print("WARNING: Selected duplicate wallpapers, retrying...")
             wallpapers = self.get_random_wallpapers(len(self.monitors))
-            if wallpapers[0] == wallpapers[1]:
+            if len(set(wallpapers)) < len(wallpapers):
                 print("ERROR: Still got duplicates, check wallpaper directory")
                 return
         
         # For GNOME, we need to use the combined wallpaper method
-        print(f"Creating combined wallpaper (3840x1080)...")
+        print(f"Creating combined wallpaper (5760x1080)...")
         combined = self.create_combined_wallpaper(wallpapers)
         
         if combined and os.path.exists(combined):
@@ -516,7 +522,7 @@ class MultiMonitorWallpaper:
                     print(f"Combined wallpaper dimensions: {dimensions}")
                     
                     # Check if dimensions match expected multi-monitor setup
-                    expected_width = sum(int(m['resolution'].split('x')[0]) for m in self.monitors[:2])
+                    expected_width = sum(int(m['resolution'].split('x')[0]) for m in self.monitors[:3])
                     expected_height = int(self.monitors[0]['resolution'].split('x')[1])
                     expected_dimensions = f"{expected_width}x{expected_height}"
                     
@@ -538,7 +544,7 @@ class MultiMonitorWallpaper:
                     
                     self.set_gnome_wallpaper(combined)
                     print(f"✓ Set combined wallpaper from:")
-                    for i, wallpaper in enumerate(wallpapers[:2]):
+                    for i, wallpaper in enumerate(wallpapers[:3]):
                         monitor_name = self.monitors[i]['name'] if i < len(self.monitors) else f"Monitor {i}"
                         print(f"  {monitor_name}: {os.path.basename(wallpaper)}")
                 else:
