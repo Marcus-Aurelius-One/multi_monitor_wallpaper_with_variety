@@ -1,6 +1,6 @@
 # Multi-Monitor Wallpaper Manager with Variety Integration
 
-A sophisticated Python script that displays different wallpapers on each monitor with inspirational quotes, leveraging Variety's excellent wallpaper sources while maintaining complete display control.
+A sophisticated Python script that displays different wallpapers on each monitor with inspirational quotes, leveraging Variety's excellent wallpaper sources while maintaining complete display control. Now supports both 2 and 3 monitor setups!
 
 ## ✨ Features
 
@@ -19,7 +19,7 @@ A sophisticated Python script that displays different wallpapers on each monitor
 - **ImageMagick** - Image processing (`convert` command)  
 - **Variety** - Wallpaper source provider
 - **GNOME** - Desktop environment (Ubuntu, Fedora, etc.)
-- **Dual monitors** - Currently optimized for two 1920x1080 displays
+- **Multiple monitors** - Supports 2 or 3 monitors (tested with 1920x1080 displays)
 
 ## 🚀 Installation
 
@@ -42,10 +42,11 @@ The installer will:
 ## 🎨 What You Get
 
 **Visual Experience:**
-- **Left Monitor**: Beautiful wallpaper (NASA space images, nature photography, etc.)
-- **Right Monitor**: Different wallpaper + inspirational quote in bottom-right corner
+- **Each Monitor**: Unique beautiful wallpaper (NASA space images, nature photography, etc.)
+- **Rightmost Monitor**: Features inspirational quote in bottom-right corner
 - **Quotes**: Elegant rounded boxes with perfect text wrapping and transparency
 - **Rotation**: Fresh content every 60 seconds with intelligent variety
+- **Multi-Monitor Support**: Automatically detects and configures for 2 or 3 monitors
 
 **Content Sources** (via Variety):
 - 🚀 **NASA APOD** - Stunning space and astronomy imagery
@@ -109,9 +110,10 @@ change_on_start = False
 ### Monitor Configuration
 
 The script automatically detects your monitors using `xrandr`. It will:
-- Use the leftmost monitor for the first wallpaper
-- Use the rightmost monitor for the second wallpaper
-- Display quotes on the rightmost monitor
+- Detect 2 or 3 monitors automatically
+- Display a unique wallpaper on each monitor
+- Place inspirational quotes on the rightmost monitor
+- Create combined images: 3840x1080 (2 monitors) or 5760x1080 (3 monitors)
 
 ### Customization
 
