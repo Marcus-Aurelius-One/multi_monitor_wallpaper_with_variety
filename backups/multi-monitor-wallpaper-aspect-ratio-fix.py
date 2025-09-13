@@ -132,101 +132,7 @@ class MultiMonitorWallpaper:
         
         print(f"Selected: {[os.path.basename(w) for w in selected]} (tracking {len(self.used_wallpapers)}/{len(wallpapers)} used)")
         return selected
-
-    def get_source_diverse_wallpapers(self, count=3):
-        """Get wallpapers ensuring source diversity: NASA + (Unsplash|Bing) + (Wallhaven|Reddit nature)"""
-        # Define source categories
-        nasa_sources = ['nasa_apod']
-        photo_sources = ['Unsplash', 'Bing']
-        nature_sources = ['wallhaven_nature', 'reddit_r_EarthPorn', 'reddit_r_NaturePorn']
-
-        # Categorize all wallpapers by source
-        wallpapers_by_source = {}
-        for root, dirs, files in os.walk(self.wallpaper_dir):
-            for file in files:
-                if file.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp')):
-                    full_path = os.path.join(root, file)
-                    source_folder = os.path.basename(root)
-                    if source_folder not in wallpapers_by_source:
-                        wallpapers_by_source[source_folder] = []
-                    wallpapers_by_source[source_folder].append(full_path)
-
-        print(f"Source breakdown: {[(k, len(v)) for k, v in wallpapers_by_source.items()]}")
-
-        # Select one from each category
-        selected = []
-        sources_used = []
-
-        # 1. Select from NASA sources
-        nasa_wallpapers = []
-        for source in nasa_sources:
-            if source in wallpapers_by_source:
-                unused = [w for w in wallpapers_by_source[source] if w not in self.used_wallpapers]
-                if unused:
-                    nasa_wallpapers.extend(unused)
-                else:
-                    nasa_wallpapers.extend(wallpapers_by_source[source])
-
-        if nasa_wallpapers:
-            nasa_pick = random.choice(nasa_wallpapers)
-            selected.append(nasa_pick)
-            sources_used.append(os.path.basename(os.path.dirname(nasa_pick)))
-            print(f"NASA selection: {os.path.basename(nasa_pick)} from {sources_used[-1]}")
-
-        # 2. Select from photo sources (Unsplash or Bing)
-        photo_wallpapers = []
-        for source in photo_sources:
-            if source in wallpapers_by_source:
-                unused = [w for w in wallpapers_by_source[source] if w not in self.used_wallpapers]
-                if unused:
-                    photo_wallpapers.extend([(w, source) for w in unused])
-                else:
-                    photo_wallpapers.extend([(w, source) for w in wallpapers_by_source[source]])
-
-        if photo_wallpapers:
-            photo_pick, photo_source = random.choice(photo_wallpapers)
-            selected.append(photo_pick)
-            sources_used.append(photo_source)
-            print(f"Photo selection: {os.path.basename(photo_pick)} from {photo_source}")
-
-        # 3. Select from nature sources (Wallhaven or Reddit)
-        nature_wallpapers = []
-        for source in nature_sources:
-            if source in wallpapers_by_source:
-                unused = [w for w in wallpapers_by_source[source] if w not in self.used_wallpapers]
-                if unused:
-                    nature_wallpapers.extend([(w, source) for w in unused])
-                else:
-                    nature_wallpapers.extend([(w, source) for w in wallpapers_by_source[source]])
-
-        if nature_wallpapers:
-            nature_pick, nature_source = random.choice(nature_wallpapers)
-            selected.append(nature_pick)
-            sources_used.append(nature_source)
-            print(f"Nature selection: {os.path.basename(nature_pick)} from {nature_source}")
-
-        # If we don't have enough, fall back to random selection from all sources
-        if len(selected) < count:
-            print(f"Only found {len(selected)} source-diverse images, filling remaining with random selection...")
-            all_wallpapers = []
-            for wallpaper_list in wallpapers_by_source.values():
-                all_wallpapers.extend(wallpaper_list)
-
-            remaining_needed = count - len(selected)
-            available = [w for w in all_wallpapers if w not in selected]
-            if available:
-                additional = random.sample(available, min(remaining_needed, len(available)))
-                selected.extend(additional)
-                for add_path in additional:
-                    add_source = os.path.basename(os.path.dirname(add_path))
-                    print(f"Additional selection: {os.path.basename(add_path)} from {add_source}")
-
-        # Mark selected wallpapers as used
-        self.used_wallpapers.update(selected)
-
-        print(f"Source-diverse selection complete: {len(selected)} wallpapers from sources: {sources_used}")
-        return selected[:count]
-
+    
     def get_quote(self):
         """Get a random quote from multiple sources like Variety uses"""
         # Expanded local quotes database (similar to what Variety might have)
@@ -554,7 +460,7 @@ class MultiMonitorWallpaper:
             return None
     
     def set_gnome_wallpaper(self, wallpaper_path):
-        """Set wallpaper using GNOME's gsettings and sync to lock screen"""
+        """Set wallpaper using GNOME's gsettings"""
         if wallpaper_path and os.path.exists(wallpaper_path):
             uri = f"file://{wallpaper_path}"
             # First set to spanned mode for multi-monitor
@@ -565,8 +471,8 @@ class MultiMonitorWallpaper:
             ])
             # Then set the wallpaper URI
             subprocess.run([
-                'gsettings', 'set',
-                'org.gnome.desktop.background',
+                'gsettings', 'set', 
+                'org.gnome.desktop.background', 
                 'picture-uri', uri
             ])
             subprocess.run([
@@ -574,19 +480,6 @@ class MultiMonitorWallpaper:
                 'org.gnome.desktop.background',
                 'picture-uri-dark', uri
             ])
-
-            # Sync the same wallpaper to lock screen for artistic office display
-            subprocess.run([
-                'gsettings', 'set',
-                'org.gnome.desktop.screensaver',
-                'picture-uri', uri
-            ])
-            subprocess.run([
-                'gsettings', 'set',
-                'org.gnome.desktop.screensaver',
-                'picture-options', 'spanned'
-            ])
-            print(f"✓ Synced wallpaper to lock screen: {os.path.basename(wallpaper_path)}")
     
     def set_wallpapers_xwallpaper(self, wallpapers):
         """Alternative method using xwallpaper"""
@@ -607,11 +500,11 @@ class MultiMonitorWallpaper:
         return False
     
     def cycle_wallpapers(self):
-        """Change wallpapers to new random ones with source diversity"""
+        """Change wallpapers to new random ones"""
         # Add safety check - if we fail 3 times in a row, wait longer
         max_retries = 3
         for attempt in range(max_retries):
-            wallpapers = self.get_source_diverse_wallpapers(len(self.monitors))
+            wallpapers = self.get_random_wallpapers(len(self.monitors))
 
             if wallpapers and len(wallpapers) >= 3:
                 break

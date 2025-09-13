@@ -1,17 +1,41 @@
 # Multi-Monitor Wallpaper Manager with Variety Integration
 
-A sophisticated Python script that displays different wallpapers on each monitor with inspirational quotes, leveraging Variety's excellent wallpaper sources while maintaining complete display control. Now supports both 2 and 3 monitor setups!
+A sophisticated Python script that displays source-diverse wallpapers across monitors with inspirational quotes, aspect ratio preservation, and lock screen synchronization. Features NASA space imagery, artistic photography, and nature scenes with perfect visual quality!
 
 ## ✨ Features
 
-- **🖼️ Different wallpapers per monitor** - Each monitor displays unique, high-quality images
+### 🎨 **Visual Excellence**
+- **🌌 Source-diverse selection** - NASA + artistic + nature imagery guaranteed per cycle
+- **📐 Aspect ratio preservation** - No stretched images! Black borders maintain perfect proportions
+- **🔒 Lock screen sync** - Beautiful wallpapers persist when locked for artistic office display
+- **🖼️ Different wallpapers per monitor** - Each monitor gets unique images from different source categories
+
+### 🎯 **Smart Content Management**
 - **💬 Dynamic inspirational quotes** - Beautiful quote overlays with rounded corners and smart text wrapping
-- **🔄 Intelligent rotation** - Avoids recent repeats and automatically requests fresh downloads
-- **🌐 Variety integration** - Leverages Variety's diverse sources (NASA APOD, Bing, National Geographic, Unsplash, etc.)
-- **🎨 Perfect formatting** - Dynamic quote box sizing with proper transparency and positioning
-- **⚡ Auto-cycling** - Configurable interval (default 60 seconds)
+- **🔄 Intelligent rotation** - Tracks used images within source categories, avoids recent repeats
+- **🌐 Curated sources** - NASA APOD, Wallhaven Nature, Unsplash, Bing, Reddit r/EarthPorn
+- **📊 Source diversity** - Left: NASA space, Middle: artistic/curated, Right: nature photography
+
+### ⚙️ **Technical Features**
+- **⚡ Auto-cycling** - 60-second wallpaper rotation with 30-minute idle timeout
 - **🚀 Auto-start on boot** - Runs reliably as a systemd user service
 - **🛡️ Conflict-free** - Completely isolates Variety's display control to prevent interference
+- **🔧 Error resilience** - Smart retry logic and graceful fallback handling
+
+## 🆕 Recent Updates (September 2025)
+
+### ✨ **Major Enhancements Added:**
+- **🎯 Source-Diverse Selection** - Guarantees NASA space + artistic + nature imagery per cycle
+- **📐 Aspect Ratio Preservation** - Images maintain perfect proportions with black borders (no more stretching!)
+- **🔒 Lock Screen Synchronization** - Beautiful wallpapers persist when computer is locked
+- **🌿 Enhanced Nature Sources** - Added Wallhaven and Reddit alternatives for failed sources
+- **⏰ 30-Minute Idle Timeout** - Perfect for office use with artistic locked display
+- **🛠️ System Stability** - Fixed infinite error loops and improved resource management
+
+### 📊 **Current Collection:**
+- **425+ curated images** from NASA APOD (355), Unsplash (49), Bing (11), Wallhaven Nature (11)
+- **Automatic source diversity** ensuring visual variety across all monitors
+- **Professional content only** - perfect for office environments
 
 ## 📋 Requirements
 

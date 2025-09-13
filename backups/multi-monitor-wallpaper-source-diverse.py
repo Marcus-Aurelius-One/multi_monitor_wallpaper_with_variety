@@ -554,7 +554,7 @@ class MultiMonitorWallpaper:
             return None
     
     def set_gnome_wallpaper(self, wallpaper_path):
-        """Set wallpaper using GNOME's gsettings and sync to lock screen"""
+        """Set wallpaper using GNOME's gsettings"""
         if wallpaper_path and os.path.exists(wallpaper_path):
             uri = f"file://{wallpaper_path}"
             # First set to spanned mode for multi-monitor
@@ -565,8 +565,8 @@ class MultiMonitorWallpaper:
             ])
             # Then set the wallpaper URI
             subprocess.run([
-                'gsettings', 'set',
-                'org.gnome.desktop.background',
+                'gsettings', 'set', 
+                'org.gnome.desktop.background', 
                 'picture-uri', uri
             ])
             subprocess.run([
@@ -574,19 +574,6 @@ class MultiMonitorWallpaper:
                 'org.gnome.desktop.background',
                 'picture-uri-dark', uri
             ])
-
-            # Sync the same wallpaper to lock screen for artistic office display
-            subprocess.run([
-                'gsettings', 'set',
-                'org.gnome.desktop.screensaver',
-                'picture-uri', uri
-            ])
-            subprocess.run([
-                'gsettings', 'set',
-                'org.gnome.desktop.screensaver',
-                'picture-options', 'spanned'
-            ])
-            print(f"✓ Synced wallpaper to lock screen: {os.path.basename(wallpaper_path)}")
     
     def set_wallpapers_xwallpaper(self, wallpapers):
         """Alternative method using xwallpaper"""
